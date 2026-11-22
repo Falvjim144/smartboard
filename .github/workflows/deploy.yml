@@ -15,20 +15,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  preparar:
+    name: Preparar sitio
     runs-on: ubuntu-latest
     steps:
       - name: Obtener archivos
         uses: actions/checkout@v4
       - name: Configurar Pages
         uses: actions/configure-pages@v5
-      - name: Preparar sitio
+      - name: Empaquetar web
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
+
+  publicar:
+    name: Publicar sitio
+    needs: preparar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Publicar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
